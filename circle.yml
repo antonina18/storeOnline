@@ -10,23 +10,23 @@ dependencies:
   override:
     - mvn clean install -DskipTests
     - docker info
-    - docker build --rm=false -t antonina18/storeOnline .
-    - docker tag antonina18/storeOnline antonina18/storeOnline:$CIRCLE_BUILD_NUM
+    - docker build --rm=false -t antonina18/storeonline .
+    - docker tag antonina18/storeOnline antonina18/storeonline:$CIRCLE_BUILD_NUM
     - docker images
 
 test:
   override:
     - mvn test
-    - docker run --name storeOnline -d -p 8080:8080 antonina18/storeOnline:$CIRCLE_BUILD_NUM ; sleep 25
+    - docker run --name storeonline -d -p 8080:8080 antonina18/storeonline:$CIRCLE_BUILD_NUM ; sleep 25
     - docker logs storeOnline
-    - curl --retry 3 --retry-delay 5 -v http://localhost:8080/storeOnline/health
+    - curl --retry 3 --retry-delay 5 -v http://localhost:8080/storeonline/health
 
 deployment:
   production:
     branch: master
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - docker push antonina18/storeOnline:$CIRCLE_BUILD_NUM
-      - docker push antonina18/storeOnline:latest
+      - docker push antonina18/storeonline:$CIRCLE_BUILD_NUM
+      - docker push antonina18/storeonline:latest
     heroku:
       appname: storeOnline-production
