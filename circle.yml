@@ -29,4 +29,4 @@ deployment:
       - docker push antonina18/storeonline:$CIRCLE_BUILD_NUM
       - docker push antonina18/storeonline:latest
     heroku:
-      appname: storeOnline-production
+      appname: store-online-sr
