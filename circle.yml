@@ -11,7 +11,7 @@ dependencies:
     - mvn clean install -DskipTests
     - docker info
     - docker build --rm=false -t antonina18/storeonline .
-    - docker tag antonina18/storeOnline antonina18/storeonline:$CIRCLE_BUILD_NUM
+    - docker tag antonina18/storeonline antonina18/storeonline:$CIRCLE_BUILD_NUM
     - docker images
 
 test:
