@@ -4,13 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <properties>
-        <start-class>store.Application</start-class>
+        <start-class>com.store.Application</start-class>
         <java.version>1.8</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
         <spring-boot.version>1.5.4.RELEASE</spring-boot.version>
         <h2.version>1.4.196</h2.version>
+        <swagger.version>2.6.1</swagger.version>
     </properties>
 
     <groupId>storeOnline</groupId>
@@ -68,6 +69,23 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok-maven-plugin</artifactId>
             <version>1.16.18.0</version>
+        </dependency>
+        <!--swagger-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${swagger.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.springfox</groupId>
+                    <artifactId>springfox-spring-web</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>
