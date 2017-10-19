@@ -5,11 +5,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-/**
- * Class holds item promotion.
- */
-@Entity
 @Data
+@Entity
 @Table(name = "SPECIAL_PRICE")
 @NoArgsConstructor
 public class SpecialPrice {
@@ -17,16 +14,24 @@ public class SpecialPrice {
     @Id
     @GeneratedValue
     @Column(name = "ID")
-    private Long id;
+    private Integer id;
 
-    @Column(name = "ITEM_X")
-    private String itemX;
+    @Column(name = "UNIT")
+    private Integer unit;
 
-    @Column(name = "ITEM_Y")
-    private String itemY;
+    @Column(name = "PRICE")
+    private Integer price;
 
-    @Column(name = "DISCOUNT")
-    private Integer discount;
+    public void setUnit(Integer unit) {
+        this.unit = unit;
+    }
 
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
 
+    public SpecialPrice(Integer unit, Integer price) {
+        this.unit = unit;
+        this.price = price;
+    }
 }

@@ -29,4 +29,8 @@ public class Item {
     @JoinColumn(name = "ITEM_ID")
     private SpecialPrice promotion;
 
+    public Item(int price, String name) {
+        this.price = price;
+        this.name = name;
+    }
 }
