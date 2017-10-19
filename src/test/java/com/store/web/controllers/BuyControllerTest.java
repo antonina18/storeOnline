@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -30,22 +31,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @ContextConfiguration(classes = Application.class)
 public class BuyControllerTest {
 
+    @Autowired
     private ConfigurableApplicationContext context;
+    @Autowired
     private BuyController buyController;
+    @Autowired
     private AuthenticationController authenticationController;
     private MockMvc mockMvc;
     private String token;
-    private ObjectMapper mapper;
-
-
-    public BuyControllerTest(ConfigurableApplicationContext context, BuyController buyController, AuthenticationController authenticationController, MockMvc mockMvc, String token) {
-        this.context = context;
-        this.buyController = buyController;
-        this.authenticationController = authenticationController;
-        this.mockMvc = mockMvc;
-        this.token = token;
-        this.mapper = new ObjectMapper();
-    }
+    private ObjectMapper mapper = new ObjectMapper();
 
     @Before
     public void setUp() throws Exception {
@@ -84,13 +78,9 @@ public class BuyControllerTest {
     }
 
     private void validateReceipt(MvcResult mvcResult) throws IOException {
-        //given
         String json = mvcResult.getResponse().getContentAsString();
-
-        //when
         final Receipt receipt = mapper.readValue(json, Receipt.class);
 
-        //then
         assertNotNull(receipt);
         receipt.getContent().forEach(product -> {
             assertNotNull(product.getPriceWithoutPromotion());
@@ -102,13 +92,8 @@ public class BuyControllerTest {
     }
 
     private void validateReceiptIsEmpty(MvcResult mvcResult) throws IOException {
-        //given
         String json = mvcResult.getResponse().getContentAsString();
-
-        //when
         final Receipt receipt = mapper.readValue(json, Receipt.class);
-
-        //then
         assertNotNull(receipt);
         assertTrue(receipt.getContent().isEmpty());
     }
