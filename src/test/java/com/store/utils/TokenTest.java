@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
 
-import javax.xml.bind.DatatypeConverter;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
@@ -45,7 +43,7 @@ public class TokenTest {
     private String MD5(String string) throws NoSuchAlgorithmException {
         final MessageDigest messageDigest = MessageDigest.getInstance("MD5");
         messageDigest.update((string + LocalDateTime.now(clock)).getBytes());
-        return DatatypeConverter.printHexBinary(messageDigest.digest()).toUpperCase();
+        return new String(messageDigest.digest()).toUpperCase();
     }
 
 }

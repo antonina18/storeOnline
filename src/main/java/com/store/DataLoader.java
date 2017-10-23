@@ -40,12 +40,12 @@ public class DataLoader {
     }
 
     private void createItemsAnPromotions() {
-        Item apple = new Item(5, "APPLE");
-        apple.setPromotion(new SpecialPrice(5, 10));
-        Item banana = new Item(2, "BANANA");
-        Item cherry = new Item(100, "CHERRY");
-        cherry.setPromotion(new SpecialPrice(2, 80));
-        Item dill = new Item(10, "DILL");
+        Item apple = new Item(5, "apple");
+        apple.setSpecialPrice(new SpecialPrice(5, 10));
+        Item banana = new Item(2, "banana");
+        Item cherry = new Item(100, "cherry");
+        cherry.setSpecialPrice(new SpecialPrice(2, 80));
+        Item dill = new Item(10, "dill");
 
         itemRepository.save(apple);
         itemRepository.save(banana);

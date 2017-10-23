@@ -1,8 +1,8 @@
 package com.store.stub;
 
 
+import com.store.dto.BuyItemDto;
 import com.store.persistence.entities.Item;
-import com.store.persistence.entities.SpecialPrice;
 
 public class ItemObjectMother {
 
@@ -14,20 +14,10 @@ public class ItemObjectMother {
         return item;
     }
 
-    public static Item itemWithSpecialPrice(String name, Integer price, SpecialPrice specialPrice){
-        Item item = new Item();
-        item.setName(name);
-        item.setPrice(price);
-        item.setPromotion(specialPrice);
-
-        return item;
-    }
-
-    public static SpecialPrice specialPrice(Integer unit, Integer price){
-        SpecialPrice specialPrice = new SpecialPrice();
-        specialPrice.setUnit(unit);
-        specialPrice.setPrice(price);
-
-        return specialPrice;
+    public static BuyItemDto buyItemDto(String name, Integer units){
+        BuyItemDto buyItemDto = new BuyItemDto();
+        buyItemDto.setName(name);
+        buyItemDto.setUnits(units);
+        return buyItemDto;
     }
 }
