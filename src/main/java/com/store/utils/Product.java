@@ -8,8 +8,6 @@ import lombok.Data;
 public class Product {
 
     private String name;
-    private Integer amount;
+    private Integer units;
     private Integer priceWithoutPromotion;
-    private Integer promotionRefund;
-    private Integer finalPrice;
 }

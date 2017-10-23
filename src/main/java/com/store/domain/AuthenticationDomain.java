@@ -2,10 +2,9 @@ package com.store.domain;
 
 import com.store.persistence.entities.Customer;
 import com.store.persistence.repositories.CustomerRepository;
-import com.store.utils.Response;
 import com.store.utils.Token;
+import com.store.utils.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -27,21 +26,22 @@ public class AuthenticationDomain implements IAuthenticationDomain {
 
     @Override
     @Transactional
-    public Response login(String name) {
+    public Token login(String name) throws UnauthorizedException {
         final Optional<Customer> customer = customerRepository.findByName(name);
         return customer.map(this::generateToken)
-            .orElse(Response.create(HttpStatus.UNAUTHORIZED.name()));
+            .filter(token -> token.getValue() != null || !token.getValue().isEmpty())
+            .orElseThrow(UnauthorizedException::new);
     }
 
-    private Response generateToken(Customer customer) {
+    private Token generateToken(Customer customer) {
         return Token.generateToken(customer)
             .map(token -> populateTokenStorage(token, customer.getName()))
-            .orElse(Response.create("Error while generating token"));
+            .orElse(new Token());
     }
 
-    private Response populateTokenStorage(Token token, String name) {
+    private Token populateTokenStorage(Token token, String name) {
         tokens.put(token, name);
-        return Response.create(token, Response.OK);
+        return token;
     }
 
     @Override
@@ -50,6 +50,12 @@ public class AuthenticationDomain implements IAuthenticationDomain {
         final String customerName = tokens.get(token);
         return customerRepository.findByName(customerName);
     }
+
+    @Override
+    public boolean containsToken(Token token) {
+        return token != null && token.getValue() != null && tokens.containsKey(token);
+    }
+
 
 
 

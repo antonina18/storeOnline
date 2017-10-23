@@ -27,7 +27,7 @@ public class Item {
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "ITEM_ID")
-    private SpecialPrice promotion;
+    private SpecialPrice specialPrice;
 
     public Item(int price, String name) {
         this.price = price;
