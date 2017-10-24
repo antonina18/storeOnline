@@ -14,7 +14,8 @@ import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class TokenTest {
 
@@ -26,6 +27,7 @@ public class TokenTest {
     public void setUp() throws Exception {
         customer = new Customer(TOKEN_VALUE);
     }
+
 
     @Test
     public void testGenerateToken() throws Exception {
