@@ -35,7 +35,8 @@ public class Basket {
     public void put(Item item, int unit) {
         Optional<BasketItem> optionalItem = getItem(item);
         if (optionalItem.isPresent()) {
-            optionalItem.get().incrementUnitsBy(unit);
+            BasketItem basketItem = optionalItem.get();
+            basketItem.incrementUnitsBy(unit);
         } else {
             content.add(new BasketItem(item, unit));
         }
@@ -43,7 +44,7 @@ public class Basket {
 
     private Optional<BasketItem> getItem(Item item) {
         return content.stream()
-            .filter(basketItem -> basketItem.getItem().equals(item))
+            .filter(basketItem -> basketItem.getItem().getName().equals(item.getName()))
             .findFirst();
     }
 

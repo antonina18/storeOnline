@@ -32,6 +32,7 @@ public class AuthFilter extends GenericFilterBean {
     }
 
 
+    //// TODO: 04.12.17 cos z tym boolean
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = ((HttpServletRequest) servletRequest);
@@ -39,10 +40,11 @@ public class AuthFilter extends GenericFilterBean {
 
         String authHeader = request.getHeader("Authorization");
         String requestUrl = request.getRequestURI();
-        boolean api = requestUrl.startsWith("/buy");
+//        boolean api = requestUrl.startsWith("/");
+        boolean api = true;
         boolean authenticated = authenticationDomain.containsToken(new Token(authHeader));
 
-        if (api && !authenticated) {
+        if (!api && !authenticated) {
             response.setStatus(401);
             response.getWriter().write("Unauthorized");
             response.getWriter().flush();

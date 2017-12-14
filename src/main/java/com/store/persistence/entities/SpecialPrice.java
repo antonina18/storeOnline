@@ -1,5 +1,6 @@
 package com.store.persistence.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +10,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "SPECIAL_PRICE")
 @NoArgsConstructor
+@AllArgsConstructor
 public class SpecialPrice {
 
     @Id
@@ -22,16 +24,10 @@ public class SpecialPrice {
     @Column(name = "PRICE")
     private Integer price;
 
-    public void setUnit(Integer unit) {
-        this.unit = unit;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
-
     public SpecialPrice(Integer unit, Integer price) {
         this.unit = unit;
         this.price = price;
     }
+
+
 }

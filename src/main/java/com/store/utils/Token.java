@@ -9,6 +9,8 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import javax.xml.bind.DatatypeConverter;
+
 import static org.springframework.util.Assert.notNull;
 
 @Data
@@ -38,7 +40,7 @@ public class Token {
     }
 
     private static Token createToken(MessageDigest messageDigest) {
-        final String encryptedString = new String(messageDigest.digest()).toUpperCase();
+        final String encryptedString = DatatypeConverter.printHexBinary(messageDigest.digest()).toUpperCase();
         return new Token(encryptedString);
     }
 

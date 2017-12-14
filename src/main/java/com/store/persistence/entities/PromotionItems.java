@@ -29,4 +29,9 @@ public class PromotionItems {
     private Integer discount;
 
 
+    public PromotionItems(String itemX, String itemY, Integer discount) {
+        this.itemX = itemX;
+        this.itemY = itemY;
+        this.discount = discount;
+    }
 }

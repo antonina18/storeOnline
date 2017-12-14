@@ -56,7 +56,4 @@ public class AuthenticationDomain implements IAuthenticationDomain {
         return token != null && token.getValue() != null && tokens.containsKey(token);
     }
 
-
-
-
 }

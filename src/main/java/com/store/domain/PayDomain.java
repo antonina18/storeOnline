@@ -3,7 +3,10 @@ package com.store.domain;
 import com.store.dto.BuyItemDto;
 import com.store.persistence.entities.*;
 import com.store.persistence.repositories.ItemRepository;
+import com.store.persistence.repositories.MagazineRepository;
 import com.store.persistence.repositories.PromotionItemsRepository;
+import com.store.persistence.repositories.SpecialPriceRepository;
+import com.store.utils.Product;
 import com.store.utils.Receipt;
 import com.store.utils.Token;
 import org.springframework.stereotype.Service;
@@ -16,21 +19,29 @@ import javax.transaction.Transactional;
 @Service
 public class PayDomain implements IPayDomain {
 
-    private final ItemRepository itemRepository;
     private final IAuthenticationDomain authenticationDomain;
     private final PromotionItemsRepository promotionItemsRepository;
+    private final MagazineRepository magazineRepository;
+    private final ItemRepository itemRepository;
+    private final SpecialPriceRepository specialPriceRepository;
 
-    public PayDomain(ItemRepository itemRepository, IAuthenticationDomain authenticationDomain, PromotionItemsRepository promotionItemsRepository) {
-        this.itemRepository = itemRepository;
+    public PayDomain(IAuthenticationDomain authenticationDomain, PromotionItemsRepository promotionItemsRepository, MagazineRepository magazineRepository, ItemRepository itemRepository, SpecialPriceRepository specialPriceRepository) {
         this.authenticationDomain = authenticationDomain;
         this.promotionItemsRepository = promotionItemsRepository;
+        this.magazineRepository = magazineRepository;
+        this.itemRepository = itemRepository;
+        this.specialPriceRepository = specialPriceRepository;
     }
 
     @Override
     @Transactional
     public Receipt putItemToBasket(Token token, BuyItemDto buyItemDto) {
         Optional<Item> item = itemRepository.findByName(buyItemDto.getName());
-        item.ifPresent(it -> getBasket(token).put(it, buyItemDto.getUnits()));
+        item.ifPresent(it -> {
+            if(it.getUnit() >= buyItemDto.getUnits())
+            getBasket(token).put(it, buyItemDto.getUnits());
+            removeItemsFromMagazine(token, buyItemDto.getUnits());
+        });
         return scanBasket(token);
     }
 
@@ -49,6 +60,35 @@ public class PayDomain implements IPayDomain {
     public void clearBasket(Token token) {
         Optional<Customer> customer = authenticationDomain.getCustomer(token);
         customer.ifPresent(Customer::clearBasket);
+    }
+
+    private void removeItemsFromMagazine(Token token, Integer units) {
+        Basket basket = getBasket(token);
+        basket.getProducts()
+            .stream()
+            .map(Product::getName)
+            .forEach(name -> {
+                findItemAndRemove(units, name);
+            });
+    }
+
+    private void findItemAndRemove(Integer units, String name) {
+        Optional<Item> item = itemRepository.findByName(name);
+        item.ifPresent(it -> {
+            Magazine magazine = getMagazine();
+            magazine.getItems()
+                .forEach(i-> removeItem(units, i));
+        });
+    }
+
+    private void removeItem(Integer units, Item i) {
+        if (!i.getUnit().equals(0) && i.getUnit() > units) {
+            i.setUnit(i.getUnit() - units);
+        }
+    }
+
+    private Magazine getMagazine() {
+        return magazineRepository.findById(1L);
     }
 
     //// TODO: 19.10.17  cos z tym null
@@ -80,10 +120,12 @@ public class PayDomain implements IPayDomain {
         Integer amountForSpecialPrice = 0;
         Integer priceWithSpecialPrice = 0;
         Integer specialPriceAmount = 0;
-        SpecialPrice specialPrice = basketItem.getItem().getSpecialPrice();
-        if (specialPrice != null) {
-            amountForSpecialPrice = specialPrice.getUnit();
-            priceWithSpecialPrice = specialPrice.getPrice();
+        Integer specialPriceId = basketItem.getItem().getSpecialPriceId();
+        Optional<SpecialPrice> specialPrice = specialPriceRepository.findById(specialPriceId);
+
+        if (specialPrice.isPresent()) {
+            amountForSpecialPrice = specialPrice.get().getUnit();
+            priceWithSpecialPrice = specialPrice.get().getPrice();
             specialPriceAmount = basketItem.getUnits() / amountForSpecialPrice;
         }
         Integer normalPriceAmount = basketItem.getUnits() - (specialPriceAmount * amountForSpecialPrice);

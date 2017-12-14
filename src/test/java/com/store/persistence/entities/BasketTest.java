@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 
 import static com.store.stub.ItemObjectMother.item;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -79,7 +80,7 @@ public class BasketTest {
         List<Product> actual = basket.getProducts();
 
         //then
-        assertThat(actual, is(equalTo(expected)));
+        assertThat(actual, is(containsInAnyOrder(expected.toArray())));
     }
 
     @Test

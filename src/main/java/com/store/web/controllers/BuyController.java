@@ -5,7 +5,6 @@ import com.store.domain.IPayDomain;
 import com.store.dto.BuyItemDto;
 import com.store.utils.Receipt;
 import com.store.utils.Token;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,14 +20,15 @@ public class BuyController {
 
     private final IPayDomain payDomain;
 
-    @Autowired
     public BuyController(IPayDomain payDomain) {
         this.payDomain = payDomain;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "item/add")
-    public ResponseEntity<Receipt> addItemToBasket(@Valid BuyItemDto buyItemDto,
-                                      @RequestHeader("Authorization") final String auth) {
+    //// TODO: 04.12.17 cena specjalna dla czeresni przypisuje sie ta dla jablek..
+    @PostMapping("item/add")
+    public ResponseEntity<Receipt> addItemToBasket(
+        @RequestBody BuyItemDto buyItemDto,
+        @RequestHeader("Authorization") final String auth) {
         Receipt receipt = payDomain.putItemToBasket(new Token(auth), buyItemDto);
         return new ResponseEntity<>(receipt, HttpStatus.OK);
     }
