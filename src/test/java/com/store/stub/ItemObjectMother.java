@@ -14,6 +14,16 @@ public class ItemObjectMother {
         return item;
     }
 
+
+    public static Item itemWithUnits(String name, Integer price, Integer units) {
+        Item item = new Item();
+        item.setName(name);
+        item.setPrice(price);
+        item.setUnit(units);
+        return item;
+    }
+
+
     public static BuyItemDto buyItemDto(String name, Integer units){
         BuyItemDto buyItemDto = new BuyItemDto();
         buyItemDto.setName(name);

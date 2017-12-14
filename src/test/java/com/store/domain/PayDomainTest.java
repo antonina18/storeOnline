@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 
 import static com.store.stub.ItemObjectMother.buyItemDto;
 import static com.store.stub.ItemObjectMother.item;
+import static com.store.stub.ItemObjectMother.itemWithUnits;
 import static com.store.stub.PromotionItemsObjectMother.promotionItems;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -26,6 +27,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -54,16 +56,19 @@ public class PayDomainTest {
         token = new Token("ADMIN");
         customer = new Customer("ADMIN");
         when(authenticationDomain.getCustomer(any())).thenReturn(Optional.of(customer));
+        when(magazineRepository.findById(1L)).thenReturn(new Magazine());
     }
 
     @Test
     public void putItemToBasket() throws Exception {
         //given
         Receipt expected = new Receipt(createListWithOneProduct(),25, 0, 25);
+        SpecialPrice specialPrice = new SpecialPrice(3,3, 300);
+        when(specialPriceRepository.findById(anyInt())).thenReturn(Optional.of(specialPrice));
 
-        Item apple = item("apple", 5);
-        when(magazineRepository.findItemByName(eq("apple"))).thenReturn(Optional.of(apple));
-
+        Item apple = itemWithUnits("apple", 5, 5);
+        when(itemRepository.findByName(eq("apple"))).thenReturn(Optional.of(apple));
+        apple.setSpecialPriceId(specialPrice.getId());
         //when
         Receipt actual = payDomain.putItemToBasket(token, buyItemDto("apple", 5));
 
@@ -75,11 +80,11 @@ public class PayDomainTest {
     @Test
     public void putItemToBasketWithSpecialPriceItem() throws Exception {
         //given
-        Item apple = item("apple", 5);
-        when(magazineRepository.findItemByName(eq("apple"))).thenReturn(Optional.of(apple));
+        Item apple = itemWithUnits("apple", 5, 5);
+        when(itemRepository.findByName(eq("apple"))).thenReturn(Optional.of(apple));
         SpecialPrice specialPrice = new SpecialPrice(1, 3, 3);
         apple.setSpecialPriceId(specialPrice.getId());
-
+        when(specialPriceRepository.findById(anyInt())).thenReturn(Optional.of(specialPrice));
         Receipt expected = new Receipt(createListWithOneProduct(), 25, 12, 13);
 
         //when
@@ -97,14 +102,15 @@ public class PayDomainTest {
         //given
         given(promotionItemsRepository.findAll()).willReturn(createPromotionItems());
         Receipt expected = new Receipt(createListWithMoreProducts(), 40, 1, 39);
-        Item banana = item("banana", 5);
-        when(magazineRepository.findItemByName(eq("banana"))).thenReturn(Optional.of(banana));
+        Item banana = itemWithUnits("banana", 5, 5);
+        when(itemRepository.findByName(eq("banana"))).thenReturn(Optional.of(banana));
+        when(specialPriceRepository.findById(anyInt())).thenReturn(Optional.empty());
 
         //when
         payDomain.putItemToBasket(token, buyItemDto("banana", 5));
 
-        Item bread = item("bread", 5);
-        when(magazineRepository.findItemByName(eq("bread"))).thenReturn(Optional.of(bread));
+        Item bread = itemWithUnits("bread", 5, 3);
+        when(itemRepository.findByName(eq("bread"))).thenReturn(Optional.of(bread));
         Receipt actual = payDomain.putItemToBasket(token, buyItemDto("bread", 3));
 
         //then
@@ -118,17 +124,18 @@ public class PayDomainTest {
     public void putItemToBasketWithBothPromotionShouldReturnSpecialPrice() throws Exception {
         //given
         given(promotionItemsRepository.findAll()).willReturn(createPromotionItems());
-        Receipt expected = new Receipt(createListWithMoreProducts(), 40, 12, 28);
-        Item banana = item("banana", 5);
+        Receipt expected = new Receipt(createListWithMoreProducts(), 40, 24, 16);
+        Item banana = itemWithUnits("banana", 5, 5);
         SpecialPrice specialPrice = new SpecialPrice(2,3, 3);
         banana.setSpecialPriceId(specialPrice.getId());
-        when(magazineRepository.findItemByName(eq("banana"))).thenReturn(Optional.of(banana));
+        when(specialPriceRepository.findById(anyInt())).thenReturn(Optional.of(specialPrice));
+        when(itemRepository.findByName(eq("banana"))).thenReturn(Optional.of(banana));
 
         //when
         payDomain.putItemToBasket(token, buyItemDto("banana", 5));
 
-        Item bread = item("bread", 5);
-        when(magazineRepository.findItemByName(eq("bread"))).thenReturn(Optional.of(bread));
+        Item bread = itemWithUnits("bread", 5, 3);
+        when(itemRepository.findByName(eq("bread"))).thenReturn(Optional.of(bread));
         Receipt actual = payDomain.putItemToBasket(token, buyItemDto("bread", 3));
 
         //then
@@ -141,18 +148,23 @@ public class PayDomainTest {
     @Test
     public void putItemToBasketWithBothPromotionsShouldChoosePromotionItems() throws Exception {
         //given
+        Magazine magazine = new Magazine();
+        magazine.setId(1L);
         given(promotionItemsRepository.findAll()).willReturn(createPromotionItems());
         Receipt expected = new Receipt(createListWithMoreProducts(), 40, 1, 39);
-        Item banana = item("banana", 5);
+        Item banana = itemWithUnits("banana", 5, 5);
         SpecialPrice specialPrice = new SpecialPrice(3,3, 300);
+        when(specialPriceRepository.findById(anyInt())).thenReturn(Optional.of(specialPrice));
         banana.setSpecialPriceId(specialPrice.getId());
-        when(magazineRepository.findItemByName(eq("banana"))).thenReturn(Optional.of(banana));
+        banana.setMagazine(magazine);
+        when(itemRepository.findByName(eq("banana"))).thenReturn(Optional.of(banana));
 
         //when
         payDomain.putItemToBasket(token, buyItemDto("banana", 5));
 
-        Item bread = item("bread", 5);
-        when(magazineRepository.findItemByName(eq("bread"))).thenReturn(Optional.of(bread));
+        Item bread = itemWithUnits("bread", 5, 3);
+        when(itemRepository.findByName(eq("bread"))).thenReturn(Optional.of(bread));
+        bread.setMagazine(magazine);
         Receipt actual = payDomain.putItemToBasket(token, buyItemDto("bread", 3));
 
         //then
@@ -179,9 +191,6 @@ public class PayDomainTest {
         //then
         assertTrue(customer.getBasket().getContent().isEmpty());
     }
-
-    // TODO: 30.10.17 zrobic test na usuwanie zawartosci i dodawanie
-
 
     private List<PromotionItems> createPromotionItems() {
         PromotionItems promotionItem = promotionItems("banana", "cherry", 3);

@@ -43,6 +43,9 @@ public class BasketTest {
     public void putAndIncrementShouldHaveOneItem() throws Exception {
         //given
         Item item = new Item();
+        item.setName("banana");
+        BasketItem basketItem = new BasketItem(item("banana", 1), 2);
+        prepareBasket(basketItem);
 
         //when
         basket.put(item, 1);
@@ -50,7 +53,7 @@ public class BasketTest {
 
         //then
         assertThat(basket.getContent().size(), is(equalTo(1)));
-        assertThat(basket.getContent().iterator().next().getUnits(), is(equalTo(3)));
+        assertThat(basket.getContent().iterator().next().getUnits(), is(equalTo(5)));
     }
 
     @Test
